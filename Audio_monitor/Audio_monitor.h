@@ -1,9 +1,7 @@
 #ifndef Audio_monitor_h
 #define Audio_monitor_h
 
-/// Turns on/off serial diagnostic output
-boolean debug = false;
-
+#include "Arduino.h"
 
 
 /// Singleton class that performs interrupt-driven sampling of the amplitude inputs from
@@ -13,9 +11,9 @@ class Audio_monitor
 public:
   static const byte SAMPLE_INTERVAL = 1; // milliseconds
   static const unsigned int MAX_AMPLITUDE = 1023; //don't change this (for now anyway)
-  static const float SENSITIVITY_MULTIPLIER = 5;
+  static const float SENSITIVITY_MULTIPLIER = 1; //inputs get multiplied by this
 
-  /// Gets the one static instance of the class that's allowed to exist
+  /// Gets the one static instance of the class
   static const Audio_monitor& instance();
   
   /// Returns the average of the last AMP_SIZE amplitude measurements
@@ -37,8 +35,6 @@ private:
   static Audio_monitor singleton;
   byte amp_cnt;
   unsigned int sum;
-  unsigned int last_reading;
-  unsigned int amp;
   
   /// Private so that no one can create additional instances
   Audio_monitor();
@@ -49,11 +45,8 @@ private:
   
   ~Audio_monitor();
 
-  /// Store the latest value in the amplitudes array and also update the sum
-  /// so that we don't have to recalculate it every time we want to calc the average
+  /// Called by update_amplitude
   void update( unsigned int latest_value );
-  
-  void update_weight_peaks( unsigned int latest_value );
   
   /// Interrupt callback (has to be static)
   static void update_amplitude();
